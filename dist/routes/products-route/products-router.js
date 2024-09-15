@@ -4,11 +4,40 @@ exports.productsRouter = void 0;
 const express_1 = require("express");
 const products_repository_1 = require("../../repositories/products-repository");
 exports.productsRouter = (0, express_1.Router)({});
+//middleware
+const createdMiddleware = (req, res, next) => {
+    // @ts-ignore
+    req.blabla = "Hello";
+    next();
+};
+const authGuardMiddleware = (req, res, next) => {
+    // @ts-ignore
+    if (req.query.token === "123") {
+        next();
+    }
+    else {
+        res.send(401);
+    }
+};
+//if in query http://localhost:5000/products?token=123 - ok, next
+//else - Unauthorized
+let requestsCount = 0;
+const requestsCountMiddleware = (req, res, next) => {
+    requestsCount++;
+    next();
+};
+exports.productsRouter.use(requestsCountMiddleware); //count number of requests
+exports.productsRouter.use(createdMiddleware);
+exports.productsRouter.use(authGuardMiddleware);
 exports.productsRouter.get('/', (req, res) => {
-    var _a;
-    const foundProduct = products_repository_1.productsRepository.findProduct((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString());
-    res.send(foundProduct);
+    // @ts-ignore
+    const blabla = req.blabla;
+    res.send({ value: blabla + "!!!!" + requestsCount });
 });
+/*productsRouter.get('/', (req: Request, res: Response) => {
+    const foundProduct = productsRepository.findProduct(req.query.title?.toString())
+    res.send(foundProduct)
+})*/
 exports.productsRouter.get('/:id', (req, res) => {
     const product = products_repository_1.productsRepository.findProductById(+req.params.id);
     product ? res.send(product) : res.send(404);
