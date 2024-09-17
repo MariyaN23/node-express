@@ -1,13 +1,14 @@
 import {Request, Response, Router} from "express";
-import {productsRepository, ProductType} from "../../repositories/products-repository";
+//import {productsRepository, ProductType} from "../../repositories/products-in-memory-repository";
+import {productsRepository, ProductType} from "../../repositories/products-db-repository";
 import {body} from "express-validator";
 import {inputValidationMiddleware} from "../../middlewares/input-validation-middleware";
 
 export const productsRouter = Router({})
 
 const titleValidation = body('title').trim().isLength({
-    min: 3,
-    max: 10
+    min: 1,
+    max: 30
 }).withMessage("Title length should be from 3 to 10 symbols")
 
 productsRouter.get('/', async (req: Request, res: Response) => {
@@ -27,7 +28,7 @@ productsRouter.get('/', async (req: Request, res: Response) => {
     }, 3000)*/
 })
 productsRouter.get('/:id', async (req: Request, res: Response) => {
-    const product: ProductType | undefined = await productsRepository.findProductById(+req.params.id)
+    const product: ProductType | null = await productsRepository.findProductById(+req.params.id)
     product ? res.send(product) : res.send(404)
 })
 productsRouter.post('/',
@@ -42,7 +43,8 @@ productsRouter.put('/:id',
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
         const isUpdated: boolean = await productsRepository.updateProduct(+req.params.id, req.body.title)
-        isUpdated ? res.send(productsRepository.findProductById(+req.params.id)) : res.send(404)
+        const product: ProductType | null = await productsRepository.findProductById(+req.params.id)
+        isUpdated ? res.send(product) : res.send(404)
     })
 productsRouter.delete('/:id', async (req: Request, res: Response) => {
     const isDeleted: boolean | undefined = await productsRepository.deleteProduct(+req.params.id)
