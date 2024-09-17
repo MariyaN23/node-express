@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productsRouter = void 0;
 const express_1 = require("express");
@@ -10,24 +19,34 @@ const titleValidation = (0, express_validator_1.body)('title').trim().isLength({
     min: 3,
     max: 10
 }).withMessage("Title length should be from 3 to 10 symbols");
-exports.productsRouter.get('/', (req, res) => {
+exports.productsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const foundProduct = products_repository_1.productsRepository.findProduct((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString());
+    const foundProduct = yield products_repository_1.productsRepository.findProduct((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString());
     res.send(foundProduct);
-});
-exports.productsRouter.get('/:id', (req, res) => {
-    const product = products_repository_1.productsRepository.findProductById(+req.params.id);
+    //synchronous
+    /*let start = performance.now()
+    while (performance.now() - start < 3000) {
+        console.log(performance.now() - start)
+        //do nothing
+    }*/
+    //asynchronous
+    /*setInterval(()=> {
+        res.send(foundProduct)
+    }, 3000)*/
+}));
+exports.productsRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const product = yield products_repository_1.productsRepository.findProductById(+req.params.id);
     product ? res.send(product) : res.send(404);
-});
-exports.productsRouter.post('/', titleValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => {
-    const newProduct = products_repository_1.productsRepository.createProduct(req.body.title);
+}));
+exports.productsRouter.post('/', titleValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newProduct = yield products_repository_1.productsRepository.createProduct(req.body.title);
     res.status(201).send(newProduct);
-});
-exports.productsRouter.put('/:id', titleValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => {
-    const isUpdated = products_repository_1.productsRepository.updateProduct(+req.params.id, req.body.title);
+}));
+exports.productsRouter.put('/:id', titleValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const isUpdated = yield products_repository_1.productsRepository.updateProduct(+req.params.id, req.body.title);
     isUpdated ? res.send(products_repository_1.productsRepository.findProductById(+req.params.id)) : res.send(404);
-});
-exports.productsRouter.delete('/:id', (req, res) => {
-    const isDeleted = products_repository_1.productsRepository.deleteProduct(+req.params.id);
+}));
+exports.productsRouter.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const isDeleted = yield products_repository_1.productsRepository.deleteProduct(+req.params.id);
     isDeleted ? res.send(204) : res.send(404);
-});
+}));
