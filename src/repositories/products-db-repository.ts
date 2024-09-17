@@ -9,15 +9,10 @@ export const productsRepository = {
         return productsCollection.find(filter).toArray()
     },
     async findProductById(id: number): Promise<ProductType | null>  {
-        const product = await productsCollection.findOne({id})
-        if (product) {
-            return product
-        } else {
-            return null
-        }
+        let product: ProductType | null = await productsCollection.findOne({id})
+        return product
     },
-    async createProduct(title: string): Promise<ProductType> {
-        const newProduct: ProductType = {id: +new Date(), title}
+    async createProduct(newProduct: ProductType): Promise<ProductType> {
         await productsCollection.insertOne(newProduct)
         return newProduct
     },
